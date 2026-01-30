@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CCOAN Blog Formatter</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+            color: #333;
+        }
+        h1 { color: #2c3e50; margin-bottom: 5px; }
+        .subtitle { color: #666; margin-bottom: 30px; }
+        .section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #2c3e50;
+        }
+        .hint {
+            font-size: 13px;
+            color: #888;
+            font-weight: normal;
+            margin-left: 8px;
+        }
+        #inputArea {
+            width: 100%;
+            min-height: 300px;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            line-height: 1.6;
+            overflow-y: auto;
+            background: white;
+        }
+        #inputArea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        #inputArea:empty:before {
+            content: "Paste the entire blog content from Word here...\A\ABold and italic text will be preserved!";
+            white-space: pre-wrap;
+            color: #999;
+        }
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            line-height: 1.6;
+            resize: vertical;
+            font-family: inherit;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        #outputCode {
+            min-height: 200px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 12px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+        }
+        .btn {
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        .btn-primary { background: #3498db; color: white; }
+        .btn-primary:hover { background: #2980b9; }
+        .btn-secondary { background: #95a5a6; color: white; }
+        .btn-secondary:hover { background: #7f8c8d; }
+        .btn-copy { background: #27ae60; color: white; }
+        .btn-copy:hover { background: #219a52; }
+        .copy-feedback {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .copy-feedback.show { opacity: 1; }
+        .instructions {
+            background: #e8f4f8;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 6px 6px 0;
+        }
+        .instructions h3 { margin: 0 0 10px 0; color: #2980b9; }
+        .instructions ol { margin: 0; padding-left: 20px; }
+        .instructions li { margin-bottom: 8px; }
+        .preview {
+            background: #fff9e6;
+            border: 1px solid #f1c40f;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            display: none;
+        }
+        .preview.show { display: block; }
+        .preview h4 { margin: 0 0 10px 0; color: #856404; }
+        .preview ul { margin: 0; padding-left: 20px; }
+        .preview li { margin-bottom: 5px; }
+        .detected { color: #27ae60; font-weight: 600; }
+        .tab-container { display: flex; gap: 5px; margin-bottom: 15px; }
+        .tab {
+            padding: 10px 20px;
+            background: #e0e0e0;
+            border: none;
+            border-radius: 6px 6px 0 0;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .tab.active { background: #3498db; color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .excerpt-output {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            border: 1px solid #dee2e6;
+        }
+        .excerpt-output h4 { margin: 0 0 10px 0; color: #495057; }
+        .char-count { font-size: 13px; margin-top: 5px; }
+        .char-count.good { color: #27ae60; }
+        .char-count.warning { color: #e67e22; }
+        .note-box {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #155724;
+        }
+    </style>
+</head>
+<body>
+    <h1>CCOAN Blog Formatter</h1>
+    <p class="subtitle">Paste once, get formatted WordPress blocks + excerpt</p>
+
+    <div class="instructions">
+        <h3>How to Use</h3>
+        <ol>
+            <li><strong>Copy</strong> the entire blog content from your Word document (Ctrl+A, Ctrl+C)</li>
+            <li><strong>Paste</strong> it in the box below (bold/italic formatting preserved!)</li>
+            <li>Click <strong>Format for WordPress</strong></li>
+            <li>In WordPress: Click the <strong>⋮ menu</strong> (top right) → <strong>Code editor</strong></li>
+            <li><strong>Select all</strong> existing code (Ctrl+A) and <strong>paste</strong> the generated code (Ctrl+V)</li>
+            <li>Click <strong>⋮ menu</strong> → <strong>Visual editor</strong> to return to normal view</li>
+            <li>Add your images to the placeholder spots</li>
+        </ol>
+    </div>
+
+    <div class="section">
+        <label>Paste Your Blog Content Here <span class="hint">(from Word document)</span></label>
+        <div id="inputArea" contenteditable="true"></div>
+        <div class="note-box">
+            <strong>✓ Bold and italic text from Word will be preserved when you paste</strong>
+        </div>
+        
+        <div id="preview" class="preview">
+            <h4>📋 Detected Structure:</h4>
+            <ul id="previewList"></ul>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-bottom: 20px;">
+        <button class="btn btn-primary" onclick="formatBlog()">Format for WordPress</button>
+        <button class="btn btn-secondary" onclick="clearAll()">Clear All</button>
+    </div>
+
+    <div class="section">
+        <div class="tab-container">
+            <button class="tab active" onclick="switchTab('blocks')">WordPress Blocks</button>
+            <button class="tab" onclick="switchTab('excerpt')">Excerpt</button>
+        </div>
+        
+        <div id="blocksTab" class="tab-content active">
+            <label>Generated WordPress Block Code <span class="hint">(paste in Code Editor)</span></label>
+            <textarea id="outputCode" readonly placeholder="WordPress block code will appear here..."></textarea>
+            <div style="margin-top: 15px;">
+                <button class="btn btn-copy" onclick="copyCode()">Copy Block Code</button>
+                <span id="copyFeedback" class="copy-feedback">✓ Copied!</span>
+            </div>
+        </div>
+
+        <div id="excerptTab" class="tab-content">
+            <div class="excerpt-output">
+                <h4>Generated Excerpt (340-350 characters)</h4>
+                <textarea id="excerptOutput" rows="4" style="width:100%; margin-top:10px;"></textarea>
+                <div class="char-count" id="excerptCharCount">0 / 350 characters</div>
+                <div style="margin-top: 10px;">
+                    <button class="btn btn-copy" onclick="copyExcerpt()">Copy Excerpt</button>
+                    <span id="excerptCopyFeedback" class="copy-feedback">✓ Copied!</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            if (tab === 'blocks') {
+                document.querySelectorAll('.tab')[0].classList.add('active');
+                document.getElementById('blocksTab').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab')[1].classList.add('active');
+                document.getElementById('excerptTab').classList.add('active');
+            }
+        }
+
+        function cleanWordHtml(html) {
+            // Step 1: Normalize bold and italic tags
+            let cleaned = html
+                .replace(/<b\b[^>]*>/gi, '<strong>')
+                .replace(/<\/b>/gi, '</strong>')
+                .replace(/<i\b[^>]*>/gi, '<em>')
+                .replace(/<\/i>/gi, '</em>');
+            
+            // Step 2: Remove all attributes from strong and em tags
+            cleaned = cleaned
+                .replace(/<strong[^>]*>/gi, '<strong>')
+                .replace(/<em[^>]*>/gi, '<em>');
+            
+            // Step 3: Remove Microsoft Office specific tags
+            cleaned = cleaned
+                .replace(/<o:p>[\s\S]*?<\/o:p>/gi, '')
+                .replace(/<\/?(o|w|m|v):[^>]*>/gi, '')
+                .replace(/<!--\[if[\s\S]*?<!\[endif\]-->/gi, '')
+                .replace(/<!--[\s\S]*?-->/gi, '');
+            
+            // Step 4: Remove all span, font, and style tags but keep content
+            cleaned = cleaned
+                .replace(/<span[^>]*>([\s\S]*?)<\/span>/gi, '$1')
+                .replace(/<font[^>]*>([\s\S]*?)<\/font>/gi, '$1');
+            
+            // Step 5: Remove style and class attributes from all remaining tags
+            cleaned = cleaned
+                .replace(/\s+style="[^"]*"/gi, '')
+                .replace(/\s+class="[^"]*"/gi, '')
+                .replace(/\s+lang="[^"]*"/gi, '')
+                .replace(/\s+align="[^"]*"/gi, '');
+            
+            // Step 6: Remove MsoNormal paragraphs wrapper but keep content
+            cleaned = cleaned.replace(/<p[^>]*>([\s\S]*?)<\/p>/gi, '$1\n\n');
+            
+            // Step 7: Convert div and br to newlines
+            cleaned = cleaned
+                .replace(/<div[^>]*>/gi, '\n')
+                .replace(/<\/div>/gi, '')
+                .replace(/<br\s*\/?>/gi, '\n');
+            
+            // Step 8: Remove any remaining HTML tags except strong and em
+            cleaned = cleaned.replace(/<(?!\/?(?:strong|em)(?:\s|>))[^>]+>/gi, '');
+            
+            // Step 9: Clean up whitespace and special characters
+            cleaned = cleaned
+                .replace(/&nbsp;/gi, ' ')
+                .replace(/&amp;/gi, '&')
+                .replace(/&lt;/gi, '<')
+                .replace(/&gt;/gi, '>')
+                .replace(/&quot;/gi, '"')
+                .replace(/&#39;/gi, "'")
+                .replace(/\u00A0/g, ' ')  // Non-breaking space
+                .replace(/\r\n/g, '\n')
+                .replace(/\r/g, '\n');
+            
+            // Step 10: Clean up empty tags
+            cleaned = cleaned
+                .replace(/<strong>\s*<\/strong>/gi, '')
+                .replace(/<em>\s*<\/em>/gi, '')
+                .replace(/<strong><\/strong>/gi, '')
+                .replace(/<em><\/em>/gi, '');
+            
+            // Step 11: Fix nested/duplicate tags
+            cleaned = cleaned
+                .replace(/<strong>\s*<strong>/gi, '<strong>')
+                .replace(/<\/strong>\s*<\/strong>/gi, '</strong>')
+                .replace(/<em>\s*<em>/gi, '<em>')
+                .replace(/<\/em>\s*<\/em>/gi, '</em>');
+            
+            // Step 12: Normalize multiple newlines to double newlines (paragraph separator)
+            cleaned = cleaned
+                .replace(/\n{3,}/g, '\n\n')
+                .trim();
+            
+            return cleaned;
+        }
+
+        function getPlainText(html) {
+            return html.replace(/<[^>]*>/g, '').trim();
+        }
+
+        function isAllCaps(str) {
+            const cleaned = str.replace(/[^a-zA-Z]/g, '');
+            return cleaned.length > 3 && cleaned === cleaned.toUpperCase();
+        }
+
+        function isSectionTitle(text) {
+            const plainText = getPlainText(text).trim();
+            if (plainText.length < 5 || plainText.length > 200) return false;
+            return isAllCaps(plainText);
+        }
+
+        function escapeForWP(text) {
+            // Only escape & < > but preserve our strong/em tags
+            return text
+                .replace(/&(?!amp;|lt;|gt;|quot;)/g, '&amp;')
+                .replace(/<(?!\/?(?:strong|em)>)/g, '&lt;')
+                .replace(/(?<!<\/?(?:strong|em))>/g, '&gt;');
+        }
+
+        function splitIntoSentences(text) {
+            const plainText = getPlainText(text);
+            const cleaned = plainText
+                .replace(/Mr\./g, 'Mr‣')
+                .replace(/Mrs\./g, 'Mrs‣')
+                .replace(/Ms\./g, 'Ms‣')
+                .replace(/Dr\./g, 'Dr‣')
+                .replace(/Prof\./g, 'Prof‣')
+                .replace(/Rev\./g, 'Rev‣')
+                .replace(/St\./g, 'St‣')
+                .replace(/Jr\./g, 'Jr‣')
+                .replace(/Sr\./g, 'Sr‣')
+                .replace(/vs\./g, 'vs‣')
+                .replace(/etc\./g, 'etc‣')
+                .replace(/i\.e\./g, 'i‣e‣')
+                .replace(/e\.g\./g, 'e‣g‣');
+            
+            const sentences = cleaned.split(/(?<=[.!?])\s+(?=[A-Z])/);
+            return sentences.map(s => s.replace(/‣/g, '.').trim()).filter(s => s.length > 0);
+        }
+
+        function generateExcerpt(paragraphs) {
+            if (paragraphs.length < 1) return '';
+            
+            const para1 = getPlainText(paragraphs[0]);
+            const para2 = paragraphs.length > 1 ? getPlainText(paragraphs[1]) : '';
+            
+            const sentences1 = splitIntoSentences(para1);
+            const sentences2 = splitIntoSentences(para2);
+            
+            let excerpt = '';
+            
+            if (sentences1.length > 0) {
+                excerpt = sentences1[0];
+            }
+            
+            if (sentences2.length > 0) {
+                excerpt += ' ' + sentences2[0];
+            }
+            
+            const minLength = 340;
+            const targetLength = 347;
+            
+            // Add more content if needed
+            let sentencePool = [...sentences2.slice(1)];
+            let wordIndex = 0;
+            let currentSentenceIndex = 0;
+            
+            while (excerpt.length < minLength && sentencePool.length > currentSentenceIndex) {
+                const words = sentencePool[currentSentenceIndex].split(' ');
+                while (wordIndex < words.length && excerpt.length < targetLength) {
+                    excerpt += ' ' + words[wordIndex];
+                    wordIndex++;
+                }
+                if (wordIndex >= words.length) {
+                    currentSentenceIndex++;
+                    wordIndex = 0;
+                }
+            }
+            
+            // Trim if too long
+            if (excerpt.length > targetLength) {
+                excerpt = excerpt.substring(0, targetLength);
+                const lastSpace = excerpt.lastIndexOf(' ');
+                if (lastSpace > minLength) {
+                    excerpt = excerpt.substring(0, lastSpace);
+                }
+            }
+            
+            excerpt = excerpt.trimEnd().replace(/[.,;:!?]+$/, '') + '...';
+            
+            return excerpt;
+        }
+
+        function formatBlog() {
+            const inputArea = document.getElementById('inputArea');
+            const rawHtml = inputArea.innerHTML;
+            
+            if (!rawHtml || rawHtml.trim().length < 10) {
+                alert('Please paste your blog content first.');
+                return;
+            }
+
+            // Clean Word HTML
+            const cleanedContent = cleanWordHtml(rawHtml);
+            
+            // Split into paragraphs by double newlines
+            const paragraphs = cleanedContent.split(/\n\n+/)
+                .map(p => p.replace(/\n/g, ' ').trim())
+                .filter(p => p.length > 0);
+
+            if (paragraphs.length < 3) {
+                alert('Content seems too short. Please paste the full blog content.');
+                return;
+            }
+
+            // Detect structure
+            const structure = {
+                title: paragraphs[0],
+                sections: []
+            };
+
+            let currentSection = {
+                type: 'message',
+                title: null,
+                paragraphs: []
+            };
+
+            let testimonyCount = 0;
+            let confirmationCount = 0;
+
+            for (let i = 1; i < paragraphs.length; i++) {
+                const para = paragraphs[i];
+                const plainPara = getPlainText(para);
+                
+                if (isSectionTitle(plainPara)) {
+                    if (currentSection.paragraphs.length > 0) {
+                        structure.sections.push(currentSection);
+                    }
+                    
+                    const lowerPara = plainPara.toLowerCase();
+                    let sectionType = 'testimony';
+                    
+                    if (lowerPara.includes('confirm') || lowerPara.includes('prophetic') || 
+                        lowerPara.includes('prophecy') || lowerPara.includes('deliverance')) {
+                        sectionType = 'confirmation';
+                        confirmationCount++;
+                    } else {
+                        testimonyCount++;
+                    }
+                    
+                    currentSection = {
+                        type: sectionType,
+                        title: para,
+                        plainTitle: plainPara,
+                        anchor: sectionType === 'testimony' ? `testimony-${testimonyCount}` : `confirmation-${confirmationCount}`,
+                        paragraphs: []
+                    };
+                } else {
+                    currentSection.paragraphs.push(para);
+                }
+            }
+            
+            if (currentSection.paragraphs.length > 0) {
+                structure.sections.push(currentSection);
+            }
+
+            // Show preview
+            const previewList = document.getElementById('previewList');
+            const titlePreview = getPlainText(structure.title);
+            previewList.innerHTML = `<li><span class="detected">Title:</span> ${titlePreview.substring(0, 50)}${titlePreview.length > 50 ? '...' : ''}</li>`;
+            
+            structure.sections.forEach((section) => {
+                const typeLabel = section.type.charAt(0).toUpperCase() + section.type.slice(1);
+                const titleText = section.plainTitle ? section.plainTitle.substring(0, 40) + (section.plainTitle.length > 40 ? '...' : '') : '(Message content)';
+                previewList.innerHTML += `<li><span class="detected">${typeLabel}:</span> ${titleText} (${section.paragraphs.length} paragraphs)</li>`;
+            });
+            
+            document.getElementById('preview').classList.add('show');
+
+            // Generate WordPress blocks
+            let blocks = '';
+            
+            // Article Title - H1 Centered BOLD
+            const titlePlain = getPlainText(structure.title);
+            blocks += `<!-- wp:heading {"textAlign":"center","level":1} -->
+<h1 class="wp-block-heading has-text-align-center"><strong>${titlePlain}</strong></h1>
+<!-- /wp:heading -->
+
+`;
+
+            // Get message section
+            const messageSection = structure.sections.find(s => s.type === 'message') || structure.sections[0];
+            const messageParagraphs = messageSection ? messageSection.paragraphs : [];
+            
+            // Intro paragraph
+            if (messageParagraphs.length > 0) {
+                blocks += `<!-- wp:paragraph -->
+<p>${messageParagraphs[0]}</p>
+<!-- /wp:paragraph -->
+
+`;
+            }
+
+            // Worship Tiled Gallery placeholder
+            blocks += `<!-- wp:jetpack/tiled-gallery {"columnWidths":[["50.00000","50.00000"]],"ids":[]} -->
+<!-- /wp:jetpack/tiled-gallery -->
+
+`;
+
+            // 50px Spacer
+            blocks += `<!-- wp:spacer {"height":"50px"} -->
+<div style="height:50px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+`;
+
+            // First sermon paragraph with anchor
+            if (messageParagraphs.length > 1) {
+                blocks += `<!-- wp:paragraph {"anchor":"message"} -->
+<p id="message">${messageParagraphs[1]}</p>
+<!-- /wp:paragraph -->
+
+`;
+            }
+
+            // Sermon image placeholder
+            blocks += `<!-- wp:image {"align":"left","sizeSlug":"large"} -->
+<figure class="wp-block-image alignleft size-large"><img src="" alt="Sermon image"/></figure>
+<!-- /wp:image -->
+
+`;
+
+            // Remaining message paragraphs
+            for (let i = 2; i < messageParagraphs.length; i++) {
+                blocks += `<!-- wp:paragraph -->
+<p>${messageParagraphs[i]}</p>
+<!-- /wp:paragraph -->
+
+`;
+            }
+
+            // 30px Spacer before sections
+            blocks += `<!-- wp:spacer {"height":"30px"} -->
+<div style="height:30px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+`;
+
+            // Process testimony and confirmation sections
+            structure.sections.forEach((section) => {
+                if (section.type === 'message') return;
+                
+                // Section heading - H2 BOLD
+                blocks += `<!-- wp:heading {"anchor":"${section.anchor}"} -->
+<h2 class="wp-block-heading" id="${section.anchor}"><strong>${section.plainTitle}</strong></h2>
+<!-- /wp:heading -->
+
+`;
+
+                // Image placeholder
+                blocks += `<!-- wp:image {"sizeSlug":"large"} -->
+<figure class="wp-block-image size-large"><img src="" alt="${section.type} image"/></figure>
+<!-- /wp:image -->
+
+`;
+
+                // Section paragraphs
+                section.paragraphs.forEach(para => {
+                    blocks += `<!-- wp:paragraph -->
+<p>${para}</p>
+<!-- /wp:paragraph -->
+
+`;
+                });
+
+                // 30px Spacer
+                blocks += `<!-- wp:spacer {"height":"30px"} -->
+<div style="height:30px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+`;
+            });
+
+            // 20px Spacer before final gallery
+            blocks += `<!-- wp:spacer {"height":"20px"} -->
+<div style="height:20px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+`;
+
+            // Final Tiled Gallery
+            blocks += `<!-- wp:jetpack/tiled-gallery {"columnWidths":[["33.33333","33.33333","33.33333"]],"ids":[]} -->
+<!-- /wp:jetpack/tiled-gallery -->
+`;
+
+            document.getElementById('outputCode').value = blocks;
+
+            // Generate excerpt
+            const excerpt = generateExcerpt(messageParagraphs);
+            document.getElementById('excerptOutput').value = excerpt;
+            
+            const charCount = excerpt.length;
+            const charCountEl = document.getElementById('excerptCharCount');
+            charCountEl.textContent = `${charCount} / 350 characters`;
+            charCountEl.className = (charCount >= 340 && charCount <= 355) ? 'char-count good' : 'char-count warning';
+        }
+
+        function copyCode() {
+            const output = document.getElementById('outputCode');
+            output.select();
+            navigator.clipboard.writeText(output.value).then(() => {
+                const feedback = document.getElementById('copyFeedback');
+                feedback.classList.add('show');
+                setTimeout(() => feedback.classList.remove('show'), 2000);
+            });
+        }
+
+        function copyExcerpt() {
+            const output = document.getElementById('excerptOutput');
+            output.select();
+            navigator.clipboard.writeText(output.value).then(() => {
+                const feedback = document.getElementById('excerptCopyFeedback');
+                feedback.classList.add('show');
+                setTimeout(() => feedback.classList.remove('show'), 2000);
+            });
+        }
+
+        function clearAll() {
+            document.getElementById('inputArea').innerHTML = '';
+            document.getElementById('outputCode').value = '';
+            document.getElementById('excerptOutput').value = '';
+            document.getElementById('excerptCharCount').textContent = '0 / 350 characters';
+            document.getElementById('excerptCharCount').className = 'char-count';
+            document.getElementById('preview').classList.remove('show');
+        }
+    </script>
+</body>
+</html>
