@@ -4,170 +4,449 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CCOAN Blog Formatter</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; }
+        :root {
+            --brand:       #1E2470;
+            --brandLight:  #2A32A0;
+            --brandBright: #3D48C8;
+            --brandDim:    rgba(30,36,112,0.18);
+            --brandBorder: rgba(30,36,112,0.45);
+            --brandSoft:   rgba(61,72,200,0.12);
+            --accent:      #4A6CF7;
+            --accentDim:   rgba(74,108,247,0.14);
+            --accentBorder:rgba(74,108,247,0.35);
+            --bg:          #0B0D14;
+            --surface:     #12151E;
+            --surfaceRaised:#181C28;
+            --border:      #1E2230;
+            --borderLight: #282E40;
+            --text:        #E8E8EC;
+            --textMuted:   #8890A4;
+            --textDim:     #5A6178;
+            --white:       #FFFFFF;
+            --red:         #E04040;
+            --redDim:      rgba(224,64,64,0.12);
+            --green:       #2EAA5A;
+            --greenDim:    rgba(46,170,90,0.12);
+            --orange:      #E8922A;
+            --orangeDim:   rgba(232,146,42,0.12);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            max-width: 1000px;
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Subtle grid background */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(74,108,247,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(74,108,247,0.04) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Glowing orb top */
+        body::after {
+            content: '';
+            position: fixed;
+            top: -200px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 700px;
+            height: 400px;
+            background: radial-gradient(ellipse, rgba(30,36,112,0.55) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .wrapper {
+            position: relative;
+            z-index: 1;
+            max-width: 980px;
             margin: 0 auto;
-            padding: 20px;
-            background: #f5f5f5;
-            color: #333;
+            padding: 0 20px 60px;
         }
-        h1 { color: #2c3e50; margin-bottom: 5px; }
-        .subtitle { color: #666; margin-bottom: 30px; }
-        .section {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
+
+        /* ── HEADER ── */
+        .header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 48px 0 36px;
+            position: relative;
+        }
+
+        .logo {
+            height: 64px;
             margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            filter: drop-shadow(0 4px 18px rgba(74,108,247,0.35));
         }
+
+        .header-title {
+            font-family: 'Cinzel', serif;
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            background: linear-gradient(135deg, #fff 30%, #8899ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+        }
+
+        .header-sub {
+            margin-top: 8px;
+            font-size: 14px;
+            color: var(--textMuted);
+            letter-spacing: 0.04em;
+        }
+
+        .divider {
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--brandBorder), var(--accentBorder), var(--brandBorder), transparent);
+            margin: 28px 0;
+        }
+
+        /* ── INSTRUCTIONS ── */
+        .instructions {
+            background: linear-gradient(135deg, rgba(30,36,112,0.22) 0%, rgba(74,108,247,0.08) 100%);
+            border: 1px solid var(--brandBorder);
+            border-left: 3px solid var(--accent);
+            padding: 20px 24px;
+            border-radius: 10px;
+            margin-bottom: 24px;
+        }
+
+        .instructions h3 {
+            font-family: 'Cinzel', serif;
+            font-size: 13px;
+            letter-spacing: 0.1em;
+            color: var(--accent);
+            margin-bottom: 14px;
+            text-transform: uppercase;
+        }
+
+        .instructions ol {
+            padding-left: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .instructions li {
+            font-size: 13.5px;
+            color: var(--textMuted);
+            line-height: 1.5;
+        }
+
+        .instructions li strong {
+            color: var(--text);
+        }
+
+        /* ── SECTION CARD ── */
+        .section {
+            background: var(--surface);
+            border: 1px solid var(--borderLight);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.35), 0 1px 0 rgba(255,255,255,0.03) inset;
+        }
+
         label {
             display: block;
+            font-size: 12px;
             font-weight: 600;
-            margin-bottom: 8px;
-            color: #2c3e50;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--textMuted);
+            margin-bottom: 12px;
         }
-        .hint {
-            font-size: 13px;
-            color: #888;
-            font-weight: normal;
-            margin-left: 8px;
+
+        label .hint {
+            font-weight: 400;
+            letter-spacing: 0;
+            text-transform: none;
+            color: var(--textDim);
+            margin-left: 6px;
         }
+
+        /* ── INPUT AREA (stays WHITE per requirement) ── */
         #inputArea {
             width: 100%;
-            min-height: 300px;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 6px;
+            min-height: 280px;
+            padding: 16px;
+            border: 1px solid #d0d5e8;
+            border-radius: 8px;
             font-size: 14px;
-            line-height: 1.6;
+            line-height: 1.7;
             overflow-y: auto;
-            background: white;
+            background: #ffffff;
+            color: #1a1a2e;
+            font-family: 'DM Sans', sans-serif;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
+
         #inputArea:focus {
             outline: none;
-            border-color: #3498db;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accentDim);
         }
+
         #inputArea:empty:before {
             content: "Paste the entire blog content from Word here...\A\ABold and italic text will be preserved!";
             white-space: pre-wrap;
-            color: #999;
+            color: #aab0c8;
         }
-        textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 6px;
-            font-size: 14px;
-            line-height: 1.6;
-            resize: vertical;
-            font-family: inherit;
+
+        .note-box {
+            background: var(--greenDim);
+            border: 1px solid rgba(46,170,90,0.3);
+            border-radius: 7px;
+            padding: 10px 14px;
+            margin-top: 12px;
+            font-size: 12.5px;
+            color: #5ecf8a;
         }
-        textarea:focus {
-            outline: none;
-            border-color: #3498db;
+
+        /* ── PREVIEW ── */
+        .preview {
+            background: rgba(232,146,42,0.07);
+            border: 1px solid rgba(232,146,42,0.3);
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin-top: 14px;
+            display: none;
         }
-        #outputCode {
-            min-height: 200px;
-            font-family: 'Consolas', 'Monaco', monospace;
+
+        .preview.show { display: block; }
+
+        .preview h4 {
             font-size: 12px;
-            background: #1e1e1e;
-            color: #d4d4d4;
-        }
-        .btn {
-            padding: 12px 24px;
-            font-size: 16px;
-            font-weight: 600;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-            margin-right: 10px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--orange);
             margin-bottom: 10px;
         }
-        .btn-primary { background: #3498db; color: white; }
-        .btn-primary:hover { background: #2980b9; }
-        .btn-secondary { background: #95a5a6; color: white; }
-        .btn-secondary:hover { background: #7f8c8d; }
-        .btn-copy { background: #27ae60; color: white; }
-        .btn-copy:hover { background: #219a52; }
+
+        .preview ul {
+            padding-left: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .preview li {
+            font-size: 13px;
+            color: var(--textMuted);
+        }
+
+        .detected { color: var(--accent); font-weight: 600; }
+
+        /* ── BUTTONS ── */
+        .btn-row {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 4px 0 20px;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: 'DM Sans', sans-serif;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: 0.02em;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(255,255,255,0);
+            transition: background 0.15s;
+        }
+
+        .btn:hover::after { background: rgba(255,255,255,0.07); }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--brandBright), var(--accent));
+            color: #fff;
+            box-shadow: 0 4px 18px rgba(74,108,247,0.35);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 6px 24px rgba(74,108,247,0.5);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--surfaceRaised);
+            color: var(--textMuted);
+            border: 1px solid var(--borderLight);
+        }
+
+        .btn-secondary:hover { color: var(--text); border-color: var(--textDim); }
+
+        .btn-copy {
+            background: linear-gradient(135deg, #1a7a40, var(--green));
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(46,170,90,0.25);
+        }
+
+        .btn-copy:hover {
+            box-shadow: 0 6px 20px rgba(46,170,90,0.4);
+            transform: translateY(-1px);
+        }
+
         .copy-feedback {
             display: inline-block;
             margin-left: 10px;
-            color: #27ae60;
+            color: var(--green);
             font-weight: 600;
+            font-size: 13px;
             opacity: 0;
             transition: opacity 0.3s;
         }
+
         .copy-feedback.show { opacity: 1; }
-        .instructions {
-            background: #e8f4f8;
-            border-left: 4px solid #3498db;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 0 6px 6px 0;
+
+        /* ── TABS ── */
+        .tab-container {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 18px;
+            border-bottom: 1px solid var(--borderLight);
+            padding-bottom: 0;
         }
-        .instructions h3 { margin: 0 0 10px 0; color: #2980b9; }
-        .instructions ol { margin: 0; padding-left: 20px; }
-        .instructions li { margin-bottom: 8px; }
-        .preview {
-            background: #fff9e6;
-            border: 1px solid #f1c40f;
-            padding: 15px;
-            border-radius: 6px;
-            margin-top: 15px;
-            display: none;
-        }
-        .preview.show { display: block; }
-        .preview h4 { margin: 0 0 10px 0; color: #856404; }
-        .preview ul { margin: 0; padding-left: 20px; }
-        .preview li { margin-bottom: 5px; }
-        .detected { color: #27ae60; font-weight: 600; }
-        .tab-container { display: flex; gap: 5px; margin-bottom: 15px; }
+
         .tab {
-            padding: 10px 20px;
-            background: #e0e0e0;
-            border: none;
-            border-radius: 6px 6px 0 0;
-            cursor: pointer;
+            padding: 9px 20px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
             font-weight: 600;
+            letter-spacing: 0.04em;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            color: var(--textDim);
+            transition: all 0.2s;
+            margin-bottom: -1px;
         }
-        .tab.active { background: #3498db; color: white; }
+
+        .tab:hover { color: var(--textMuted); }
+
+        .tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        .excerpt-output {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 6px;
-            margin-top: 15px;
-            border: 1px solid #dee2e6;
-        }
-        .excerpt-output h4 { margin: 0 0 10px 0; color: #495057; }
-        .char-count { font-size: 13px; margin-top: 5px; }
-        .char-count.good { color: #27ae60; }
-        .char-count.warning { color: #e67e22; }
-        .note-box {
-            background: #d4edda;
-            border: 1px solid #c3e6cb;
-            padding: 12px;
-            border-radius: 6px;
-            margin-top: 10px;
+
+        /* ── OUTPUT TEXTAREA ── */
+        textarea {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid var(--borderLight);
+            border-radius: 8px;
             font-size: 13px;
-            color: #155724;
+            line-height: 1.6;
+            resize: vertical;
+            font-family: inherit;
+            background: var(--surfaceRaised);
+            color: var(--text);
+            transition: border-color 0.2s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--accentBorder);
+        }
+
+        #outputCode {
+            min-height: 220px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 11.5px;
+            background: #0d1017;
+            color: #a8b8d8;
+            border-color: var(--border);
+        }
+
+        .excerpt-output {
+            background: var(--surfaceRaised);
+            border: 1px solid var(--borderLight);
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 4px;
+        }
+
+        .excerpt-output h4 {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--textMuted);
+            margin-bottom: 10px;
+        }
+
+        .char-count { font-size: 12px; margin-top: 6px; color: var(--textDim); }
+        .char-count.good  { color: var(--green); }
+        .char-count.warning { color: var(--orange); }
+
+        /* ── FOOTER ── */
+        .footer {
+            text-align: center;
+            color: var(--textDim);
+            font-size: 12px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            letter-spacing: 0.04em;
         }
     </style>
 </head>
 <body>
-    <h1>CCOAN Blog Formatter</h1>
-    <p class="subtitle">Paste once, get formatted WordPress blocks + excerpt</p>
+<div class="wrapper">
 
+    <!-- HEADER -->
+    <div class="header">
+        <img class="logo"
+             src="https://ccoan.com/almere/wp-content/uploads/sites/12/2024/04/CCOAN-Logo-White-950w-With-Shadow-2.png"
+             alt="CCOAN Logo"
+             onerror="this.style.display='none'">
+        <h1 class="header-title">Blog Formatter</h1>
+        <p class="header-sub">Paste once — get formatted WordPress blocks + excerpt</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- INSTRUCTIONS -->
     <div class="instructions">
         <h3>How to Use</h3>
         <ol>
             <li><strong>Copy</strong> the entire blog content from your Word document (Ctrl+A, Ctrl+C)</li>
-            <li><strong>Paste</strong> it in the box below (bold/italic formatting preserved!)</li>
+            <li><strong>Paste</strong> it in the box below — bold &amp; italic formatting is preserved</li>
             <li>Click <strong>Format for WordPress</strong></li>
             <li>In WordPress: Click the <strong>⋮ menu</strong> (top right) → <strong>Code editor</strong></li>
             <li><strong>Select all</strong> existing code (Ctrl+A) and <strong>paste</strong> the generated code (Ctrl+V)</li>
@@ -176,34 +455,36 @@
         </ol>
     </div>
 
+    <!-- INPUT SECTION -->
     <div class="section">
         <label>Paste Your Blog Content Here <span class="hint">(from Word document)</span></label>
         <div id="inputArea" contenteditable="true"></div>
         <div class="note-box">
             <strong>✓ Bold and italic text from Word will be preserved when you paste</strong>
         </div>
-        
         <div id="preview" class="preview">
-            <h4>📋 Detected Structure:</h4>
+            <h4>📋 Detected Structure</h4>
             <ul id="previewList"></ul>
         </div>
     </div>
 
-    <div style="text-align: center; margin-bottom: 20px;">
+    <!-- ACTION BUTTONS -->
+    <div class="btn-row">
         <button class="btn btn-primary" onclick="formatBlog()">Format for WordPress</button>
         <button class="btn btn-secondary" onclick="clearAll()">Clear All</button>
     </div>
 
+    <!-- OUTPUT SECTION -->
     <div class="section">
         <div class="tab-container">
             <button class="tab active" onclick="switchTab('blocks')">WordPress Blocks</button>
             <button class="tab" onclick="switchTab('excerpt')">Excerpt</button>
         </div>
-        
+
         <div id="blocksTab" class="tab-content active">
             <label>Generated WordPress Block Code <span class="hint">(paste in Code Editor)</span></label>
             <textarea id="outputCode" readonly placeholder="WordPress block code will appear here..."></textarea>
-            <div style="margin-top: 15px;">
+            <div style="margin-top:14px;">
                 <button class="btn btn-copy" onclick="copyCode()">Copy Block Code</button>
                 <span id="copyFeedback" class="copy-feedback">✓ Copied!</span>
             </div>
@@ -211,10 +492,10 @@
 
         <div id="excerptTab" class="tab-content">
             <div class="excerpt-output">
-                <h4>Generated Excerpt (340-350 characters)</h4>
-                <textarea id="excerptOutput" rows="4" style="width:100%; margin-top:10px;"></textarea>
+                <h4>Generated Excerpt (340–350 characters)</h4>
+                <textarea id="excerptOutput" rows="4" style="margin-top:8px;"></textarea>
                 <div class="char-count" id="excerptCharCount">0 / 350 characters</div>
-                <div style="margin-top: 10px;">
+                <div style="margin-top:12px;">
                     <button class="btn btn-copy" onclick="copyExcerpt()">Copy Excerpt</button>
                     <span id="excerptCopyFeedback" class="copy-feedback">✓ Copied!</span>
                 </div>
@@ -222,437 +503,250 @@
         </div>
     </div>
 
-    <script>
-        function switchTab(tab) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            
-            if (tab === 'blocks') {
-                document.querySelectorAll('.tab')[0].classList.add('active');
-                document.getElementById('blocksTab').classList.add('active');
+    <div class="footer">
+        CCOAN Almere &nbsp;·&nbsp; Blog Formatter &nbsp;·&nbsp; Internal Tool
+    </div>
+
+</div>
+
+<script>
+    function switchTab(tab) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        if (tab === 'blocks') {
+            document.querySelectorAll('.tab')[0].classList.add('active');
+            document.getElementById('blocksTab').classList.add('active');
+        } else {
+            document.querySelectorAll('.tab')[1].classList.add('active');
+            document.getElementById('excerptTab').classList.add('active');
+        }
+    }
+
+    function cleanWordHtml(html) {
+        let cleaned = html
+            .replace(/<b\b[^>]*>/gi, '<strong>')
+            .replace(/<\/b>/gi, '</strong>')
+            .replace(/<i\b[^>]*>/gi, '<em>')
+            .replace(/<\/i>/gi, '</em>');
+        cleaned = cleaned
+            .replace(/<strong[^>]*>/gi, '<strong>')
+            .replace(/<em[^>]*>/gi, '<em>');
+        cleaned = cleaned
+            .replace(/<o:p>[\s\S]*?<\/o:p>/gi, '')
+            .replace(/<\/?(o|w|m|v):[^>]*>/gi, '')
+            .replace(/<!--\[if[\s\S]*?<!\[endif\]-->/gi, '')
+            .replace(/<!--[\s\S]*?-->/gi, '');
+        cleaned = cleaned
+            .replace(/<span[^>]*>([\s\S]*?)<\/span>/gi, '$1')
+            .replace(/<font[^>]*>([\s\S]*?)<\/font>/gi, '$1');
+        cleaned = cleaned
+            .replace(/\s+style="[^"]*"/gi, '')
+            .replace(/\s+class="[^"]*"/gi, '')
+            .replace(/\s+lang="[^"]*"/gi, '')
+            .replace(/\s+align="[^"]*"/gi, '');
+        cleaned = cleaned.replace(/<p[^>]*>([\s\S]*?)<\/p>/gi, '$1\n\n');
+        cleaned = cleaned
+            .replace(/<div[^>]*>/gi, '\n')
+            .replace(/<\/div>/gi, '')
+            .replace(/<br\s*\/?>/gi, '\n');
+        cleaned = cleaned.replace(/<(?!\/?(?:strong|em)(?:\s|>))[^>]+>/gi, '');
+        cleaned = cleaned
+            .replace(/&nbsp;/gi, ' ')
+            .replace(/&amp;/gi, '&')
+            .replace(/&lt;/gi, '<')
+            .replace(/&gt;/gi, '>')
+            .replace(/&quot;/gi, '"')
+            .replace(/&#39;/gi, "'")
+            .replace(/\u00A0/g, ' ')
+            .replace(/\r\n/g, '\n')
+            .replace(/\r/g, '\n');
+        cleaned = cleaned
+            .replace(/<strong>\s*<\/strong>/gi, '')
+            .replace(/<em>\s*<\/em>/gi, '')
+            .replace(/<strong><\/strong>/gi, '')
+            .replace(/<em><\/em>/gi, '');
+        cleaned = cleaned
+            .replace(/<strong>\s*<strong>/gi, '<strong>')
+            .replace(/<\/strong>\s*<\/strong>/gi, '</strong>')
+            .replace(/<em>\s*<em>/gi, '<em>')
+            .replace(/<\/em>\s*<\/em>/gi, '</em>');
+        cleaned = cleaned.replace(/\n{3,}/g, '\n\n').trim();
+        return cleaned;
+    }
+
+    function getPlainText(html) {
+        return html.replace(/<[^>]*>/g, '').trim();
+    }
+
+    function isAllCaps(str) {
+        const cleaned = str.replace(/[^a-zA-Z]/g, '');
+        return cleaned.length > 3 && cleaned === cleaned.toUpperCase();
+    }
+
+    function isSectionTitle(text) {
+        const plainText = getPlainText(text).trim();
+        if (plainText.length < 5 || plainText.length > 200) return false;
+        return isAllCaps(plainText);
+    }
+
+    function splitIntoSentences(text) {
+        const plainText = getPlainText(text);
+        const cleaned = plainText
+            .replace(/Mr\./g, 'Mr‣').replace(/Mrs\./g, 'Mrs‣').replace(/Ms\./g, 'Ms‣')
+            .replace(/Dr\./g, 'Dr‣').replace(/Prof\./g, 'Prof‣').replace(/Rev\./g, 'Rev‣')
+            .replace(/St\./g, 'St‣').replace(/Jr\./g, 'Jr‣').replace(/Sr\./g, 'Sr‣')
+            .replace(/vs\./g, 'vs‣').replace(/etc\./g, 'etc‣')
+            .replace(/i\.e\./g, 'i‣e‣').replace(/e\.g\./g, 'e‣g‣');
+        const sentences = cleaned.split(/(?<=[.!?])\s+(?=[A-Z])/);
+        return sentences.map(s => s.replace(/‣/g, '.').trim()).filter(s => s.length > 0);
+    }
+
+    function generateExcerpt(paragraphs) {
+        if (paragraphs.length < 1) return '';
+        const para1 = getPlainText(paragraphs[0]);
+        const para2 = paragraphs.length > 1 ? getPlainText(paragraphs[1]) : '';
+        const sentences1 = splitIntoSentences(para1);
+        const sentences2 = splitIntoSentences(para2);
+        let excerpt = '';
+        if (sentences1.length > 0) excerpt = sentences1[0];
+        if (sentences2.length > 0) excerpt += ' ' + sentences2[0];
+        const minLength = 340, targetLength = 347;
+        let sentencePool = [...sentences2.slice(1)];
+        let wordIndex = 0, currentSentenceIndex = 0;
+        while (excerpt.length < minLength && sentencePool.length > currentSentenceIndex) {
+            const words = sentencePool[currentSentenceIndex].split(' ');
+            while (wordIndex < words.length && excerpt.length < targetLength) {
+                excerpt += ' ' + words[wordIndex++];
+            }
+            if (wordIndex >= words.length) { currentSentenceIndex++; wordIndex = 0; }
+        }
+        if (excerpt.length > targetLength) {
+            excerpt = excerpt.substring(0, targetLength);
+            const lastSpace = excerpt.lastIndexOf(' ');
+            if (lastSpace > minLength) excerpt = excerpt.substring(0, lastSpace);
+        }
+        excerpt = excerpt.trimEnd().replace(/[.,;:!?]+$/, '') + '...';
+        return excerpt;
+    }
+
+    function formatBlog() {
+        const inputArea = document.getElementById('inputArea');
+        const rawHtml = inputArea.innerHTML;
+        if (!rawHtml || rawHtml.trim().length < 10) {
+            alert('Please paste your blog content first.');
+            return;
+        }
+        const cleanedContent = cleanWordHtml(rawHtml);
+        const paragraphs = cleanedContent.split(/\n\n+/)
+            .map(p => p.replace(/\n/g, ' ').trim())
+            .filter(p => p.length > 0);
+        if (paragraphs.length < 3) {
+            alert('Content seems too short. Please paste the full blog content.');
+            return;
+        }
+        const structure = { title: paragraphs[0], sections: [] };
+        let currentSection = { type: 'message', title: null, paragraphs: [] };
+        let testimonyCount = 0, confirmationCount = 0;
+        for (let i = 1; i < paragraphs.length; i++) {
+            const para = paragraphs[i];
+            const plainPara = getPlainText(para);
+            if (isSectionTitle(plainPara)) {
+                if (currentSection.paragraphs.length > 0) structure.sections.push(currentSection);
+                const lowerPara = plainPara.toLowerCase();
+                let sectionType = 'testimony';
+                if (lowerPara.includes('confirm') || lowerPara.includes('prophetic') ||
+                    lowerPara.includes('prophecy') || lowerPara.includes('deliverance')) {
+                    sectionType = 'confirmation'; confirmationCount++;
+                } else { testimonyCount++; }
+                currentSection = {
+                    type: sectionType, title: para, plainTitle: plainPara,
+                    anchor: sectionType === 'testimony' ? `testimony-${testimonyCount}` : `confirmation-${confirmationCount}`,
+                    paragraphs: []
+                };
             } else {
-                document.querySelectorAll('.tab')[1].classList.add('active');
-                document.getElementById('excerptTab').classList.add('active');
+                currentSection.paragraphs.push(para);
             }
         }
+        if (currentSection.paragraphs.length > 0) structure.sections.push(currentSection);
 
-        function cleanWordHtml(html) {
-            // Step 1: Normalize bold and italic tags
-            let cleaned = html
-                .replace(/<b\b[^>]*>/gi, '<strong>')
-                .replace(/<\/b>/gi, '</strong>')
-                .replace(/<i\b[^>]*>/gi, '<em>')
-                .replace(/<\/i>/gi, '</em>');
-            
-            // Step 2: Remove all attributes from strong and em tags
-            cleaned = cleaned
-                .replace(/<strong[^>]*>/gi, '<strong>')
-                .replace(/<em[^>]*>/gi, '<em>');
-            
-            // Step 3: Remove Microsoft Office specific tags
-            cleaned = cleaned
-                .replace(/<o:p>[\s\S]*?<\/o:p>/gi, '')
-                .replace(/<\/?(o|w|m|v):[^>]*>/gi, '')
-                .replace(/<!--\[if[\s\S]*?<!\[endif\]-->/gi, '')
-                .replace(/<!--[\s\S]*?-->/gi, '');
-            
-            // Step 4: Remove all span, font, and style tags but keep content
-            cleaned = cleaned
-                .replace(/<span[^>]*>([\s\S]*?)<\/span>/gi, '$1')
-                .replace(/<font[^>]*>([\s\S]*?)<\/font>/gi, '$1');
-            
-            // Step 5: Remove style and class attributes from all remaining tags
-            cleaned = cleaned
-                .replace(/\s+style="[^"]*"/gi, '')
-                .replace(/\s+class="[^"]*"/gi, '')
-                .replace(/\s+lang="[^"]*"/gi, '')
-                .replace(/\s+align="[^"]*"/gi, '');
-            
-            // Step 6: Remove MsoNormal paragraphs wrapper but keep content
-            cleaned = cleaned.replace(/<p[^>]*>([\s\S]*?)<\/p>/gi, '$1\n\n');
-            
-            // Step 7: Convert div and br to newlines
-            cleaned = cleaned
-                .replace(/<div[^>]*>/gi, '\n')
-                .replace(/<\/div>/gi, '')
-                .replace(/<br\s*\/?>/gi, '\n');
-            
-            // Step 8: Remove any remaining HTML tags except strong and em
-            cleaned = cleaned.replace(/<(?!\/?(?:strong|em)(?:\s|>))[^>]+>/gi, '');
-            
-            // Step 9: Clean up whitespace and special characters
-            cleaned = cleaned
-                .replace(/&nbsp;/gi, ' ')
-                .replace(/&amp;/gi, '&')
-                .replace(/&lt;/gi, '<')
-                .replace(/&gt;/gi, '>')
-                .replace(/&quot;/gi, '"')
-                .replace(/&#39;/gi, "'")
-                .replace(/\u00A0/g, ' ')  // Non-breaking space
-                .replace(/\r\n/g, '\n')
-                .replace(/\r/g, '\n');
-            
-            // Step 10: Clean up empty tags
-            cleaned = cleaned
-                .replace(/<strong>\s*<\/strong>/gi, '')
-                .replace(/<em>\s*<\/em>/gi, '')
-                .replace(/<strong><\/strong>/gi, '')
-                .replace(/<em><\/em>/gi, '');
-            
-            // Step 11: Fix nested/duplicate tags
-            cleaned = cleaned
-                .replace(/<strong>\s*<strong>/gi, '<strong>')
-                .replace(/<\/strong>\s*<\/strong>/gi, '</strong>')
-                .replace(/<em>\s*<em>/gi, '<em>')
-                .replace(/<\/em>\s*<\/em>/gi, '</em>');
-            
-            // Step 12: Normalize multiple newlines to double newlines (paragraph separator)
-            cleaned = cleaned
-                .replace(/\n{3,}/g, '\n\n')
-                .trim();
-            
-            return cleaned;
+        const previewList = document.getElementById('previewList');
+        const titlePreview = getPlainText(structure.title);
+        previewList.innerHTML = `<li><span class="detected">Title:</span> ${titlePreview.substring(0,50)}${titlePreview.length>50?'...':''}</li>`;
+        structure.sections.forEach(section => {
+            const typeLabel = section.type.charAt(0).toUpperCase() + section.type.slice(1);
+            const titleText = section.plainTitle ? section.plainTitle.substring(0,40)+(section.plainTitle.length>40?'...':'') : '(Message content)';
+            previewList.innerHTML += `<li><span class="detected">${typeLabel}:</span> ${titleText} (${section.paragraphs.length} paragraphs)</li>`;
+        });
+        document.getElementById('preview').classList.add('show');
+
+        let blocks = '';
+        const titlePlain = getPlainText(structure.title);
+        blocks += `<!-- wp:heading {"textAlign":"center","level":1} -->\n<h1 class="wp-block-heading has-text-align-center"><strong>${titlePlain}</strong></h1>\n<!-- /wp:heading -->\n\n`;
+        const messageSection = structure.sections.find(s => s.type === 'message') || structure.sections[0];
+        const messageParagraphs = messageSection ? messageSection.paragraphs : [];
+        if (messageParagraphs.length > 0) {
+            blocks += `<!-- wp:paragraph -->\n<p>${messageParagraphs[0]}</p>\n<!-- /wp:paragraph -->\n\n`;
         }
-
-        function getPlainText(html) {
-            return html.replace(/<[^>]*>/g, '').trim();
+        blocks += `<!-- wp:jetpack/tiled-gallery {"columnWidths":[["50.00000","50.00000"]],"ids":[]} -->\n<!-- /wp:jetpack/tiled-gallery -->\n\n`;
+        blocks += `<!-- wp:spacer {"height":"50px"} -->\n<div style="height:50px" aria-hidden="true" class="wp-block-spacer"></div>\n<!-- /wp:spacer -->\n\n`;
+        if (messageParagraphs.length > 1) {
+            blocks += `<!-- wp:paragraph {"anchor":"message"} -->\n<p id="message">${messageParagraphs[1]}</p>\n<!-- /wp:paragraph -->\n\n`;
         }
-
-        function isAllCaps(str) {
-            const cleaned = str.replace(/[^a-zA-Z]/g, '');
-            return cleaned.length > 3 && cleaned === cleaned.toUpperCase();
+        blocks += `<!-- wp:image {"align":"left","sizeSlug":"large"} -->\n<figure class="wp-block-image alignleft size-large"><img src="" alt="Sermon image"/></figure>\n<!-- /wp:image -->\n\n`;
+        for (let i = 2; i < messageParagraphs.length; i++) {
+            blocks += `<!-- wp:paragraph -->\n<p>${messageParagraphs[i]}</p>\n<!-- /wp:paragraph -->\n\n`;
         }
-
-        function isSectionTitle(text) {
-            const plainText = getPlainText(text).trim();
-            if (plainText.length < 5 || plainText.length > 200) return false;
-            return isAllCaps(plainText);
-        }
-
-        function escapeForWP(text) {
-            // Only escape & < > but preserve our strong/em tags
-            return text
-                .replace(/&(?!amp;|lt;|gt;|quot;)/g, '&amp;')
-                .replace(/<(?!\/?(?:strong|em)>)/g, '&lt;')
-                .replace(/(?<!<\/?(?:strong|em))>/g, '&gt;');
-        }
-
-        function splitIntoSentences(text) {
-            const plainText = getPlainText(text);
-            const cleaned = plainText
-                .replace(/Mr\./g, 'Mr‣')
-                .replace(/Mrs\./g, 'Mrs‣')
-                .replace(/Ms\./g, 'Ms‣')
-                .replace(/Dr\./g, 'Dr‣')
-                .replace(/Prof\./g, 'Prof‣')
-                .replace(/Rev\./g, 'Rev‣')
-                .replace(/St\./g, 'St‣')
-                .replace(/Jr\./g, 'Jr‣')
-                .replace(/Sr\./g, 'Sr‣')
-                .replace(/vs\./g, 'vs‣')
-                .replace(/etc\./g, 'etc‣')
-                .replace(/i\.e\./g, 'i‣e‣')
-                .replace(/e\.g\./g, 'e‣g‣');
-            
-            const sentences = cleaned.split(/(?<=[.!?])\s+(?=[A-Z])/);
-            return sentences.map(s => s.replace(/‣/g, '.').trim()).filter(s => s.length > 0);
-        }
-
-        function generateExcerpt(paragraphs) {
-            if (paragraphs.length < 1) return '';
-            
-            const para1 = getPlainText(paragraphs[0]);
-            const para2 = paragraphs.length > 1 ? getPlainText(paragraphs[1]) : '';
-            
-            const sentences1 = splitIntoSentences(para1);
-            const sentences2 = splitIntoSentences(para2);
-            
-            let excerpt = '';
-            
-            if (sentences1.length > 0) {
-                excerpt = sentences1[0];
-            }
-            
-            if (sentences2.length > 0) {
-                excerpt += ' ' + sentences2[0];
-            }
-            
-            const minLength = 340;
-            const targetLength = 347;
-            
-            // Add more content if needed
-            let sentencePool = [...sentences2.slice(1)];
-            let wordIndex = 0;
-            let currentSentenceIndex = 0;
-            
-            while (excerpt.length < minLength && sentencePool.length > currentSentenceIndex) {
-                const words = sentencePool[currentSentenceIndex].split(' ');
-                while (wordIndex < words.length && excerpt.length < targetLength) {
-                    excerpt += ' ' + words[wordIndex];
-                    wordIndex++;
-                }
-                if (wordIndex >= words.length) {
-                    currentSentenceIndex++;
-                    wordIndex = 0;
-                }
-            }
-            
-            // Trim if too long
-            if (excerpt.length > targetLength) {
-                excerpt = excerpt.substring(0, targetLength);
-                const lastSpace = excerpt.lastIndexOf(' ');
-                if (lastSpace > minLength) {
-                    excerpt = excerpt.substring(0, lastSpace);
-                }
-            }
-            
-            excerpt = excerpt.trimEnd().replace(/[.,;:!?]+$/, '') + '...';
-            
-            return excerpt;
-        }
-
-        function formatBlog() {
-            const inputArea = document.getElementById('inputArea');
-            const rawHtml = inputArea.innerHTML;
-            
-            if (!rawHtml || rawHtml.trim().length < 10) {
-                alert('Please paste your blog content first.');
-                return;
-            }
-
-            // Clean Word HTML
-            const cleanedContent = cleanWordHtml(rawHtml);
-            
-            // Split into paragraphs by double newlines
-            const paragraphs = cleanedContent.split(/\n\n+/)
-                .map(p => p.replace(/\n/g, ' ').trim())
-                .filter(p => p.length > 0);
-
-            if (paragraphs.length < 3) {
-                alert('Content seems too short. Please paste the full blog content.');
-                return;
-            }
-
-            // Detect structure
-            const structure = {
-                title: paragraphs[0],
-                sections: []
-            };
-
-            let currentSection = {
-                type: 'message',
-                title: null,
-                paragraphs: []
-            };
-
-            let testimonyCount = 0;
-            let confirmationCount = 0;
-
-            for (let i = 1; i < paragraphs.length; i++) {
-                const para = paragraphs[i];
-                const plainPara = getPlainText(para);
-                
-                if (isSectionTitle(plainPara)) {
-                    if (currentSection.paragraphs.length > 0) {
-                        structure.sections.push(currentSection);
-                    }
-                    
-                    const lowerPara = plainPara.toLowerCase();
-                    let sectionType = 'testimony';
-                    
-                    if (lowerPara.includes('confirm') || lowerPara.includes('prophetic') || 
-                        lowerPara.includes('prophecy') || lowerPara.includes('deliverance')) {
-                        sectionType = 'confirmation';
-                        confirmationCount++;
-                    } else {
-                        testimonyCount++;
-                    }
-                    
-                    currentSection = {
-                        type: sectionType,
-                        title: para,
-                        plainTitle: plainPara,
-                        anchor: sectionType === 'testimony' ? `testimony-${testimonyCount}` : `confirmation-${confirmationCount}`,
-                        paragraphs: []
-                    };
-                } else {
-                    currentSection.paragraphs.push(para);
-                }
-            }
-            
-            if (currentSection.paragraphs.length > 0) {
-                structure.sections.push(currentSection);
-            }
-
-            // Show preview
-            const previewList = document.getElementById('previewList');
-            const titlePreview = getPlainText(structure.title);
-            previewList.innerHTML = `<li><span class="detected">Title:</span> ${titlePreview.substring(0, 50)}${titlePreview.length > 50 ? '...' : ''}</li>`;
-            
-            structure.sections.forEach((section) => {
-                const typeLabel = section.type.charAt(0).toUpperCase() + section.type.slice(1);
-                const titleText = section.plainTitle ? section.plainTitle.substring(0, 40) + (section.plainTitle.length > 40 ? '...' : '') : '(Message content)';
-                previewList.innerHTML += `<li><span class="detected">${typeLabel}:</span> ${titleText} (${section.paragraphs.length} paragraphs)</li>`;
+        blocks += `<!-- wp:spacer {"height":"30px"} -->\n<div style="height:30px" aria-hidden="true" class="wp-block-spacer"></div>\n<!-- /wp:spacer -->\n\n`;
+        structure.sections.forEach(section => {
+            if (section.type === 'message') return;
+            blocks += `<!-- wp:heading {"anchor":"${section.anchor}"} -->\n<h2 class="wp-block-heading" id="${section.anchor}"><strong>${section.plainTitle}</strong></h2>\n<!-- /wp:heading -->\n\n`;
+            blocks += `<!-- wp:image {"sizeSlug":"large"} -->\n<figure class="wp-block-image size-large"><img src="" alt="${section.type} image"/></figure>\n<!-- /wp:image -->\n\n`;
+            section.paragraphs.forEach(para => {
+                blocks += `<!-- wp:paragraph -->\n<p>${para}</p>\n<!-- /wp:paragraph -->\n\n`;
             });
-            
-            document.getElementById('preview').classList.add('show');
+            blocks += `<!-- wp:spacer {"height":"30px"} -->\n<div style="height:30px" aria-hidden="true" class="wp-block-spacer"></div>\n<!-- /wp:spacer -->\n\n`;
+        });
+        blocks += `<!-- wp:spacer {"height":"20px"} -->\n<div style="height:20px" aria-hidden="true" class="wp-block-spacer"></div>\n<!-- /wp:spacer -->\n\n`;
+        blocks += `<!-- wp:jetpack/tiled-gallery {"columnWidths":[["33.33333","33.33333","33.33333"]],"ids":[]} -->\n<!-- /wp:jetpack/tiled-gallery -->\n`;
 
-            // Generate WordPress blocks
-            let blocks = '';
-            
-            // Article Title - H1 Centered BOLD
-            const titlePlain = getPlainText(structure.title);
-            blocks += `<!-- wp:heading {"textAlign":"center","level":1} -->
-<h1 class="wp-block-heading has-text-align-center"><strong>${titlePlain}</strong></h1>
-<!-- /wp:heading -->
+        document.getElementById('outputCode').value = blocks;
 
-`;
+        const excerpt = generateExcerpt(messageParagraphs);
+        document.getElementById('excerptOutput').value = excerpt;
+        const charCount = excerpt.length;
+        const charCountEl = document.getElementById('excerptCharCount');
+        charCountEl.textContent = `${charCount} / 350 characters`;
+        charCountEl.className = (charCount >= 340 && charCount <= 355) ? 'char-count good' : 'char-count warning';
+    }
 
-            // Get message section
-            const messageSection = structure.sections.find(s => s.type === 'message') || structure.sections[0];
-            const messageParagraphs = messageSection ? messageSection.paragraphs : [];
-            
-            // Intro paragraph
-            if (messageParagraphs.length > 0) {
-                blocks += `<!-- wp:paragraph -->
-<p>${messageParagraphs[0]}</p>
-<!-- /wp:paragraph -->
+    function copyCode() {
+        const output = document.getElementById('outputCode');
+        output.select();
+        navigator.clipboard.writeText(output.value).then(() => {
+            const fb = document.getElementById('copyFeedback');
+            fb.classList.add('show');
+            setTimeout(() => fb.classList.remove('show'), 2000);
+        });
+    }
 
-`;
-            }
+    function copyExcerpt() {
+        const output = document.getElementById('excerptOutput');
+        output.select();
+        navigator.clipboard.writeText(output.value).then(() => {
+            const fb = document.getElementById('excerptCopyFeedback');
+            fb.classList.add('show');
+            setTimeout(() => fb.classList.remove('show'), 2000);
+        });
+    }
 
-            // Worship Tiled Gallery placeholder
-            blocks += `<!-- wp:jetpack/tiled-gallery {"columnWidths":[["50.00000","50.00000"]],"ids":[]} -->
-<!-- /wp:jetpack/tiled-gallery -->
-
-`;
-
-            // 50px Spacer
-            blocks += `<!-- wp:spacer {"height":"50px"} -->
-<div style="height:50px" aria-hidden="true" class="wp-block-spacer"></div>
-<!-- /wp:spacer -->
-
-`;
-
-            // First sermon paragraph with anchor
-            if (messageParagraphs.length > 1) {
-                blocks += `<!-- wp:paragraph {"anchor":"message"} -->
-<p id="message">${messageParagraphs[1]}</p>
-<!-- /wp:paragraph -->
-
-`;
-            }
-
-            // Sermon image placeholder
-            blocks += `<!-- wp:image {"align":"left","sizeSlug":"large"} -->
-<figure class="wp-block-image alignleft size-large"><img src="" alt="Sermon image"/></figure>
-<!-- /wp:image -->
-
-`;
-
-            // Remaining message paragraphs
-            for (let i = 2; i < messageParagraphs.length; i++) {
-                blocks += `<!-- wp:paragraph -->
-<p>${messageParagraphs[i]}</p>
-<!-- /wp:paragraph -->
-
-`;
-            }
-
-            // 30px Spacer before sections
-            blocks += `<!-- wp:spacer {"height":"30px"} -->
-<div style="height:30px" aria-hidden="true" class="wp-block-spacer"></div>
-<!-- /wp:spacer -->
-
-`;
-
-            // Process testimony and confirmation sections
-            structure.sections.forEach((section) => {
-                if (section.type === 'message') return;
-                
-                // Section heading - H2 BOLD
-                blocks += `<!-- wp:heading {"anchor":"${section.anchor}"} -->
-<h2 class="wp-block-heading" id="${section.anchor}"><strong>${section.plainTitle}</strong></h2>
-<!-- /wp:heading -->
-
-`;
-
-                // Image placeholder
-                blocks += `<!-- wp:image {"sizeSlug":"large"} -->
-<figure class="wp-block-image size-large"><img src="" alt="${section.type} image"/></figure>
-<!-- /wp:image -->
-
-`;
-
-                // Section paragraphs
-                section.paragraphs.forEach(para => {
-                    blocks += `<!-- wp:paragraph -->
-<p>${para}</p>
-<!-- /wp:paragraph -->
-
-`;
-                });
-
-                // 30px Spacer
-                blocks += `<!-- wp:spacer {"height":"30px"} -->
-<div style="height:30px" aria-hidden="true" class="wp-block-spacer"></div>
-<!-- /wp:spacer -->
-
-`;
-            });
-
-            // 20px Spacer before final gallery
-            blocks += `<!-- wp:spacer {"height":"20px"} -->
-<div style="height:20px" aria-hidden="true" class="wp-block-spacer"></div>
-<!-- /wp:spacer -->
-
-`;
-
-            // Final Tiled Gallery
-            blocks += `<!-- wp:jetpack/tiled-gallery {"columnWidths":[["33.33333","33.33333","33.33333"]],"ids":[]} -->
-<!-- /wp:jetpack/tiled-gallery -->
-`;
-
-            document.getElementById('outputCode').value = blocks;
-
-            // Generate excerpt
-            const excerpt = generateExcerpt(messageParagraphs);
-            document.getElementById('excerptOutput').value = excerpt;
-            
-            const charCount = excerpt.length;
-            const charCountEl = document.getElementById('excerptCharCount');
-            charCountEl.textContent = `${charCount} / 350 characters`;
-            charCountEl.className = (charCount >= 340 && charCount <= 355) ? 'char-count good' : 'char-count warning';
-        }
-
-        function copyCode() {
-            const output = document.getElementById('outputCode');
-            output.select();
-            navigator.clipboard.writeText(output.value).then(() => {
-                const feedback = document.getElementById('copyFeedback');
-                feedback.classList.add('show');
-                setTimeout(() => feedback.classList.remove('show'), 2000);
-            });
-        }
-
-        function copyExcerpt() {
-            const output = document.getElementById('excerptOutput');
-            output.select();
-            navigator.clipboard.writeText(output.value).then(() => {
-                const feedback = document.getElementById('excerptCopyFeedback');
-                feedback.classList.add('show');
-                setTimeout(() => feedback.classList.remove('show'), 2000);
-            });
-        }
-
-        function clearAll() {
-            document.getElementById('inputArea').innerHTML = '';
-            document.getElementById('outputCode').value = '';
-            document.getElementById('excerptOutput').value = '';
-            document.getElementById('excerptCharCount').textContent = '0 / 350 characters';
-            document.getElementById('excerptCharCount').className = 'char-count';
-            document.getElementById('preview').classList.remove('show');
-        }
-    </script>
+    function clearAll() {
+        document.getElementById('inputArea').innerHTML = '';
+        document.getElementById('outputCode').value = '';
+        document.getElementById('excerptOutput').value = '';
+        document.getElementById('excerptCharCount').textContent = '0 / 350 characters';
+        document.getElementById('excerptCharCount').className = 'char-count';
+        document.getElementById('preview').classList.remove('show');
+    }
+</script>
 </body>
 </html>
