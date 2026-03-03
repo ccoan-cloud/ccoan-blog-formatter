@@ -697,14 +697,26 @@
             blocks += `<!-- wp:paragraph -->\n<p>${messageParagraphs[i]}</p>\n<!-- /wp:paragraph -->\n\n`;
         }
         blocks += `<!-- wp:spacer {"height":"30px"} -->\n<div style="height:30px" aria-hidden="true" class="wp-block-spacer"></div>\n<!-- /wp:spacer -->\n\n`;
-        structure.sections.forEach(section => {
-            if (section.type === 'message') return;
+        const nonMessageSections = structure.sections.filter(s => s.type !== 'message');
+        nonMessageSections.forEach((section, idx) => {
+            const isLast = idx === nonMessageSections.length - 1;
             blocks += `<!-- wp:heading {"anchor":"${section.anchor}"} -->\n<h2 class="wp-block-heading" id="${section.anchor}"><strong>${section.plainTitle}</strong></h2>\n<!-- /wp:heading -->\n\n`;
             blocks += `<!-- wp:image {"sizeSlug":"large"} -->\n<figure class="wp-block-image size-large"><img src="" alt="${section.type} image"/></figure>\n<!-- /wp:image -->\n\n`;
-            section.paragraphs.forEach(para => {
-                blocks += `<!-- wp:paragraph -->\n<p>${para}</p>\n<!-- /wp:paragraph -->\n\n`;
-            });
-            blocks += `<!-- wp:spacer {"height":"30px"} -->\n<div style="height:30px" aria-hidden="true" class="wp-block-spacer"></div>\n<!-- /wp:spacer -->\n\n`;
+            if (isLast && section.paragraphs.length > 1) {
+                // All paragraphs except the last
+                section.paragraphs.slice(0, -1).forEach(para => {
+                    blocks += `<!-- wp:paragraph -->\n<p>${para}</p>\n<!-- /wp:paragraph -->\n\n`;
+                });
+                // 30px spacer
+                blocks += `<!-- wp:spacer {"height":"30px"} -->\n<div style="height:30px" aria-hidden="true" class="wp-block-spacer"></div>\n<!-- /wp:spacer -->\n\n`;
+                // Last paragraph with prayerline anchor
+                blocks += `<!-- wp:paragraph {"anchor":"prayerline"} -->\n<p id="prayerline">${section.paragraphs[section.paragraphs.length - 1]}</p>\n<!-- /wp:paragraph -->\n\n`;
+            } else {
+                section.paragraphs.forEach(para => {
+                    blocks += `<!-- wp:paragraph -->\n<p>${para}</p>\n<!-- /wp:paragraph -->\n\n`;
+                });
+                blocks += `<!-- wp:spacer {"height":"30px"} -->\n<div style="height:30px" aria-hidden="true" class="wp-block-spacer"></div>\n<!-- /wp:spacer -->\n\n`;
+            }
         });
         blocks += `<!-- wp:spacer {"height":"20px"} -->\n<div style="height:20px" aria-hidden="true" class="wp-block-spacer"></div>\n<!-- /wp:spacer -->\n\n`;
         blocks += `<!-- wp:jetpack/tiled-gallery {"columnWidths":[["33.33333","33.33333","33.33333"]],"ids":[]} -->\n<!-- /wp:jetpack/tiled-gallery -->\n`;
