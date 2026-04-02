@@ -710,7 +710,7 @@
                 // 30px spacer
                 blocks += `<!-- wp:spacer {"height":"30px"} -->\n<div style="height:30px" aria-hidden="true" class="wp-block-spacer"></div>\n<!-- /wp:spacer -->\n\n`;
                 // Last paragraph with prayerline anchor
-                blocks += `<!-- wp:paragraph {"anchor":"prayerline"} -->\n<p id="prayerline">${section.paragraphs[section.paragraphs.length - 1]}</p>\n<!-- /wp:paragraph -->\n\n`;
+                blocks += `<!-- wp:paragraph {"anchor":"prayer-line"} -->\n<p id="prayer-line">${section.paragraphs[section.paragraphs.length - 1]}</p>\n<!-- /wp:paragraph -->\n\n`;
             } else {
                 section.paragraphs.forEach(para => {
                     blocks += `<!-- wp:paragraph -->\n<p>${para}</p>\n<!-- /wp:paragraph -->\n\n`;
