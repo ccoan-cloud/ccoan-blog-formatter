@@ -652,15 +652,19 @@
             const plainPara = getPlainText(para);
             if (isSectionTitle(plainPara)) {
                 if (currentSection.paragraphs.length > 0) structure.sections.push(currentSection);
-                const lowerPara = plainPara.toLowerCase();
-                let sectionType = 'testimony';
-                if (lowerPara.includes('confirm') || lowerPara.includes('prophetic') ||
-                    lowerPara.includes('prophecy') || lowerPara.includes('deliverance')) {
-                    sectionType = 'confirmation'; confirmationCount++;
-                } else { testimonyCount++; }
+                let sectionType, sectionAnchor;
+                if (testimonyCount === 0) {
+                    sectionType = 'testimony';
+                    testimonyCount++;
+                    sectionAnchor = `testimony-${testimonyCount}`;
+                } else {
+                    sectionType = 'confirmation';
+                    confirmationCount++;
+                    sectionAnchor = `confirmation-${confirmationCount}`;
+                }
                 currentSection = {
                     type: sectionType, title: para, plainTitle: plainPara,
-                    anchor: sectionType === 'testimony' ? `testimony-${testimonyCount}` : `confirmation-${confirmationCount}`,
+                    anchor: sectionAnchor,
                     paragraphs: []
                 };
             } else {
